@@ -179,12 +179,16 @@ const game = {
         // Create passenger elements
         gameState.passengers.forEach(passenger => {
             passenger.element = UI.createPassenger(passenger);
+            // Debug log to verify passengers are created
+            console.log(`Passenger created: ${passenger.name} at (${passenger.pickupX}, ${passenger.pickupY})`);
         });
         
         // Create destination marker
         UI.createDestinationMarker();
         
         UI.updateMissionIndicator();
+        
+        console.log(`Mission loaded with ${gameState.passengers.length} passengers`);
     },
     
     setupInput() {
@@ -266,8 +270,8 @@ const game = {
     checkDestination() {
         if (gameState.missionComplete) return;
         
-        const allPickedUp = gameState.passengers.every(p => p.pickedUp);
-        if (!allPickedUp) {
+        const anyPickedUp = gameState.passengers.some(p => p.pickedUp);
+        if (!anyPickedUp) {
             gameState.nearDestination = false;
             return;
         }
@@ -575,8 +579,9 @@ const game = {
     drawNavigationArrow(ctx) {
         if (!gameState.currentMission || gameState.missionComplete) return;
         
-        const allPickedUp = gameState.passengers.every(p => p.pickedUp);
-        if (!allPickedUp) return; // Only show arrow when passengers are picked up
+        // Show arrow as soon as ANY passenger is picked up
+        const anyPickedUp = gameState.passengers.some(p => p.pickedUp);
+        if (!anyPickedUp) return; // Only show arrow when at least one passenger is picked up
         
         const canvas = this.canvas;
         const destination = gameState.currentMission.destination;
