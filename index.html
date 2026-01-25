@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mamu Butt's Rickshaw Chronicles</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Righteous&family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Title Screen -->
+    <div id="titleScreen" class="title-screen">
+        <div class="rickshaw-icon">🛺</div>
+        <h1 class="game-title">MAMU BUTT'S</h1>
+        <h2 class="game-title" style="font-size: 58px; margin-top: -20px;">RICKSHAW CHRONICLES</h2>
+        <p class="subtitle">Drive. Pick. Drop. Earn. Live the life!</p>
+        <button class="start-btn" onclick="game.start()">START YOUR DAY</button>
+    </div>
+
+    <!-- Game Canvas -->
+    <canvas id="gameCanvas"></canvas>
+
+    <!-- Game Container for HTML elements -->
+    <div id="gameContainer"></div>
+
+    <!-- Scripts -->
+    <script src="config.js"></script>
+    <script src="map.js"></script>
+    <script src="missions.js"></script>
+    <script src="ui.js"></script>
+    <script src="game.js"></script>
+</body>
+</html>
