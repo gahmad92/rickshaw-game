@@ -501,6 +501,9 @@ const game = {
         
         ctx.restore();
         
+        // Draw navigation arrow pointing to destination
+        this.drawNavigationArrow(ctx);
+        
         // Update HTML elements
         const rickshaw = document.getElementById('playerRickshaw');
         if (rickshaw) {
@@ -567,6 +570,65 @@ const game = {
         if (gameState.player.x > CONFIG.WORLD_WIDTH) gameState.player.x = 0;
         if (gameState.player.y < 0) gameState.player.y = CONFIG.WORLD_HEIGHT;
         if (gameState.player.y > CONFIG.WORLD_HEIGHT) gameState.player.y = 0;
+    },
+    
+    drawNavigationArrow(ctx) {
+        if (!gameState.currentMission || gameState.missionComplete) return;
+        
+        const allPickedUp = gameState.passengers.every(p => p.pickedUp);
+        if (!allPickedUp) return; // Only show arrow when passengers are picked up
+        
+        const canvas = this.canvas;
+        const destination = gameState.currentMission.destination;
+        
+        // Calculate direction to destination
+        const dx = destination.x - gameState.player.x;
+        const dy = destination.y - gameState.player.y;
+        const distance = Math.hypot(dx, dy);
+        
+        if (distance === 0) return; // Already at destination
+        
+        // Normalize direction
+        const dirX = dx / distance;
+        const dirY = dy / distance;
+        
+        // Arrow position on screen (top-center, below HUD)
+        const arrowX = canvas.width / 2;
+        const arrowY = 100;
+        const arrowSize = 40;
+        
+        // Draw arrow pointing direction
+        ctx.save();
+        ctx.translate(arrowX, arrowY);
+        ctx.rotate(Math.atan2(dirY, dirX));
+        
+        // Arrow head (triangle)
+        ctx.fillStyle = '#FFD700';
+        ctx.beginPath();
+        ctx.moveTo(arrowSize, 0);
+        ctx.lineTo(-arrowSize / 2, -arrowSize / 2);
+        ctx.lineTo(-arrowSize / 2, arrowSize / 2);
+        ctx.closePath();
+        ctx.fill();
+        
+        // Arrow outline
+        ctx.strokeStyle = '#FF8C00';
+        ctx.lineWidth = 3;
+        ctx.stroke();
+        
+        ctx.restore();
+        
+        // Draw distance below arrow
+        const distanceInMeters = Math.round(distance);
+        ctx.fillStyle = '#FFD700';
+        ctx.font = 'bold 18px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText(`📍 ${distanceInMeters}m`, arrowX, arrowY + 70);
+        
+        // Draw destination name below distance
+        ctx.font = 'bold 16px Arial';
+        ctx.fillStyle = '#FFF';
+        ctx.fillText(destination.name, arrowX, arrowY + 95);
     },
     
     gameLoop() {
