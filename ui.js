@@ -220,5 +220,183 @@ const UI = {
         earnings.style.top = y + 'px';
         this.container.appendChild(earnings);
         setTimeout(() => earnings.remove(), 2000);
+    },
+    
+    showRaceSelect() {
+        const raceSelect = document.createElement('div');
+        raceSelect.id = 'raceSelect';
+        raceSelect.className = 'notification';
+        raceSelect.style.cssText = `
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            z-index: 1000;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            width: 600px;
+        `;
+        
+        raceSelect.innerHTML = `
+            <div style="font-size: 40px; margin-bottom: 20px;">🏎️ RICKSHAW RACES 🏎️</div>
+            <div style="font-size: 18px; margin-bottom: 30px;">Choose Your Track!</div>
+            
+            <div style="display: flex; flex-direction: column; gap: 15px;">
+                <button onclick="raceMode.startRace('track1')" style="
+                    padding: 15px;
+                    font-size: 16px;
+                    background: #4CAF50;
+                    color: white;
+                    border: none;
+                    border-radius: 10px;
+                    cursor: pointer;
+                    transition: 0.3s;
+                ">
+                    🟢 CITY SPRINT (Easy) - Rs. 500
+                </button>
+                
+                <button onclick="raceMode.startRace('track2')" style="
+                    padding: 15px;
+                    font-size: 16px;
+                    background: #2196F3;
+                    color: white;
+                    border: none;
+                    border-radius: 10px;
+                    cursor: pointer;
+                    transition: 0.3s;
+                ">
+                    🔵 MOUNTAIN SLALOM (Medium) - Rs. 1000
+                </button>
+                
+                <button onclick="raceMode.startRace('track3')" style="
+                    padding: 15px;
+                    font-size: 16px;
+                    background: #F44336;
+                    color: white;
+                    border: none;
+                    border-radius: 10px;
+                    cursor: pointer;
+                    transition: 0.3s;
+                ">
+                    🔴 CHAOS CANYON (Hard) - Rs. 2000
+                </button>
+                
+                <button onclick="raceMode.exitRace()" style="
+                    padding: 15px;
+                    font-size: 16px;
+                    background: #888;
+                    color: white;
+                    border: none;
+                    border-radius: 10px;
+                    cursor: pointer;
+                    margin-top: 10px;
+                ">
+                    Back to Menu
+                </button>
+            </div>
+        `;
+        
+        this.container.appendChild(raceSelect);
+    },
+    
+    createRaceHUD() {
+        const hud = document.createElement('div');
+        hud.id = 'raceHUD';
+        hud.style.cssText = `
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            color: white;
+            font-size: 20px;
+            z-index: 100;
+            background: rgba(0,0,0,0.7);
+            padding: 15px;
+            border-radius: 10px;
+            font-weight: bold;
+        `;
+        hud.innerHTML = `
+            <div>🏎️ ${raceMode.currentTrack.name} - ${raceMode.currentTrack.difficulty}</div>
+            <div id="raceTimer">Time: 0s</div>
+            <div id="raceMoney">Penalties: Rs. 0</div>
+        `;
+        this.container.appendChild(hud);
+        
+        // Update timer
+        const timerInterval = setInterval(() => {
+            if (!raceMode.isRacing) {
+                clearInterval(timerInterval);
+                return;
+            }
+            
+            const elapsed = ((Date.now() - raceMode.startTime) / 1000).toFixed(1);
+            document.getElementById('raceTimer').textContent = `Time: ${elapsed}s`;
+            document.getElementById('raceMoney').textContent = `Penalties: -Rs. ${Math.abs(gameState.player.money)}`;
+        }, 100);
+    },
+    
+    showRaceResults(trackName, time, money, isBestTime, bestTime) {
+        const results = document.createElement('div');
+        results.className = 'notification';
+        results.style.cssText = `
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            z-index: 1000;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            width: 600px;
+        `;
+        
+        const bestTimeBonus = isBestTime ? '<div style="color: #FFD700; font-size: 24px; margin: 10px 0;">⭐ NEW BEST TIME! +Rs. 500 BONUS! ⭐</div>' : '';
+        
+        results.innerHTML = `
+            <div style="font-size: 40px; margin-bottom: 20px;">🏁 RACE COMPLETE! 🏁</div>
+            <div style="font-size: 24px; margin-bottom: 20px;">${trackName}</div>
+            
+            <div style="font-size: 20px; margin: 15px 0;">
+                <div>⏱️ Time: ${time}s</div>
+                <div style="margin: 10px 0;">💰 Earned: Rs. ${money}</div>
+                ${bestTimeBonus}
+                ${isBestTime ? `<div>Best Time: ${bestTime}s</div>` : ''}
+            </div>
+            
+            <div style="display: flex; gap: 15px; margin-top: 30px;">
+                <button onclick="raceMode.exitRace()" style="
+                    flex: 1;
+                    padding: 15px;
+                    font-size: 16px;
+                    background: #4CAF50;
+                    color: white;
+                    border: none;
+                    border-radius: 10px;
+                    cursor: pointer;
+                ">
+                    Back to Menu
+                </button>
+                <button onclick="UI.showRaceSelect()" style="
+                    flex: 1;
+                    padding: 15px;
+                    font-size: 16px;
+                    background: #2196F3;
+                    color: white;
+                    border: none;
+                    border-radius: 10px;
+                    cursor: pointer;
+                ">
+                    Try Another Race
+                </button>
+            </div>
+        `;
+        
+        this.container.appendChild(results);
     }
 };
