@@ -7,6 +7,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Righteous&family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" href="favicon.png">
+
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -17,6 +19,7 @@
         <h2 class="game-title" style="font-size: 58px; margin-top: -20px;">RICKSHAW CHRONICLES</h2>
         <p class="subtitle">Drive. Pick. Drop. Earn. Live the life!</p>
         <button class="start-btn" onclick="game.start()">START YOUR DAY</button>
+        <button class="start-btn" onclick="UI.showRaceSelect()" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); margin-top: 10px;">🏎️ RACE MODE 🏎️</button>
     </div>
 
     <!-- Game Canvas -->
@@ -30,6 +33,13 @@
     <script src="map.js"></script>
     <script src="missions.js"></script>
     <script src="ui.js"></script>
+    <script src="race.js"></script>
     <script src="game.js"></script>
+    <script>
+        // Initialize race mode on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            raceMode.init();
+        });
+    </script>
 </body>
 </html>
