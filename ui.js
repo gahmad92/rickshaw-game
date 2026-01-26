@@ -88,8 +88,51 @@ const UI = {
     createControls() {
         const controls = document.createElement('div');
         controls.className = 'controls-hint';
-        controls.innerHTML = '⬆️⬇️⬅️➡️ Drive | ENTER Pick/Drop | M Mission Menu';
+        controls.innerHTML = '⬆️⬇️⬅️➡️ Drive | ENTER Pick/Drop | M Mission Menu | 🔊 Sound';
         this.container.appendChild(controls);
+        
+        // Add sound toggle button
+        const soundBtn = document.createElement('button');
+        soundBtn.id = 'soundToggleBtn';
+        soundBtn.className = 'sound-toggle-btn';
+        soundBtn.innerHTML = '🔊';
+        soundBtn.style.cssText = `
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            border: 2px solid #FFD700;
+            color: #FFD700;
+            padding: 10px 15px;
+            border-radius: 50%;
+            font-size: 20px;
+            cursor: pointer;
+            z-index: 1000;
+            transition: all 0.3s ease;
+        `;
+        
+        soundBtn.addEventListener('mouseover', () => {
+            soundBtn.style.background = 'rgba(0, 0, 0, 0.9)';
+            soundBtn.style.transform = 'scale(1.1)';
+        });
+        
+        soundBtn.addEventListener('mouseout', () => {
+            soundBtn.style.background = 'rgba(0, 0, 0, 0.7)';
+            soundBtn.style.transform = 'scale(1)';
+        });
+        
+        soundBtn.addEventListener('click', () => {
+            const audio = document.getElementById('backgroundMusic');
+            if (audio.paused) {
+                audio.play();
+                soundBtn.innerHTML = '🔊';
+            } else {
+                audio.pause();
+                soundBtn.innerHTML = '🔇';
+            }
+        });
+        
+        this.container.appendChild(soundBtn);
     },
     
     showDialogue(speaker, text) {

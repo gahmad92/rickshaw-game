@@ -38,6 +38,9 @@ const game = {
         UI.createMamuPortrait();
         UI.createControls();
         
+        // Start background music
+        this.playBackgroundMusic();
+        
         gameState.isRunning = true;
         gameState.gameStartTime = Date.now();
         this.gameLoop();
@@ -46,6 +49,22 @@ const game = {
             UI.showDialogue("Mamu Butt", "Bismillah! 🧔 Naya din shuru ho gaya. Allah ki rehmat se kamaayi karni hai!");
             setTimeout(() => UI.closeDialogue(), 3000);
         }, 1000);
+    },
+    
+    playBackgroundMusic() {
+        const audio = document.getElementById('backgroundMusic');
+        if (audio) {
+            audio.volume = 0.3; // Set volume to 30%
+            audio.play().catch(err => console.log('Audio autoplay blocked:', err));
+        }
+    },
+    
+    stopBackgroundMusic() {
+        const audio = document.getElementById('backgroundMusic');
+        if (audio) {
+            audio.pause();
+            audio.currentTime = 0;
+        }
     },
     
     initWorld() {
