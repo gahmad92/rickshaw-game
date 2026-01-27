@@ -79,6 +79,12 @@
 | 🌊 | Water | 2 rivers + 1 lake | Rivers with wave effects |
 | 🌉 | Bridges | 4 bridges | Wooden structures with railings |
 | ═══ | Roads | 5 main roads | Horizontal & vertical routes |
+| 🌲 | Parks | 5 parks | Green spaces with benches and paths |
+| 🌾 | Farms | 4 farms | Agricultural areas with crop rows |
+| 🐄 | Animals | Multiple | Cows, sheep, horses, chickens, ducks, goats |
+| 🏪 | Shops | 20+ shops | Bakery, clothing, electronics, cafe, etc |
+| 🛒 | Markets | 4 markets | Central, East, West, North markets |
+| 🛤️ | Small Streets | 8 streets | Alleyways and scenic drives connecting areas |
 
 ## Rendering Layers (Back to Front)
 
@@ -150,6 +156,75 @@ Layer 0: Players/Passengers/UI (HTML elements on top)
 
 ✓ Mountains provide natural barriers at map edges
 ✓ Bridges connect separated areas across water
+
+## NEW FEATURES - Parks, Farms & Engagement
+
+### Parks (5 Locations)
+- **Central Park** (800, 300) - 300x280px
+  - Benches and walking paths
+  - Scenic running routes
+  
+- **Forest Park** (2200, 700) - 350x300px
+  - Near forest area, peaceful atmosphere
+  
+- **Riverside Park** (500, 2000) - 280x250px
+  - Along river with scenic views
+  
+- **Community Park** (1900, 2100) - 320x280px
+  - Central meeting point
+  
+- **Mountain View Park** (2600, 2300) - 300x300px
+  - Near mountain range, elevated views
+
+### Farms (4 Locations)
+- **North Farm** (100, 1000) - 350x400px - Wheat crops
+- **East Farm** (2800, 500) - 300x350px - Corn crops
+- **South Farm** (1100, 2500) - 400x300px - Vegetables
+- **Valley Farm** (2200, 2200) - 350x380px - Mixed crops
+
+Features:
+- Crop rows for visual variety
+- Animals roaming (diversify long runs)
+
+### Animals on Map
+**Types**: Cow, Sheep, Horse, Chicken, Duck, Goat
+- Scattered around farms and parks
+- Adds liveliness to the world
+- Good visual breaks during long runs
+
+### Shops (20+ Locations)
+**Types**: Bakery, Clothing Store, Electronics, Bookstore, Pharmacy, Cafe, Flower Shop, Toy Store
+- Distributed across all city areas
+- Colorful designs (red, teal, blue, orange, green)
+- Add interest to urban exploration
+
+### Markets (4 Locations)
+- **Central Market** (1300, 1500) - 200x180px - 12 stalls
+- **East Market** (2100, 2000) - 180x160px - 8 stalls
+- **West Market** (600, 1700) - 200x170px - 10 stalls
+- **North Market** (1700, 400) - 180x150px - 7 stalls
+
+Features:
+- Colorful stalls arranged in grid
+- Bustling marketplace atmosphere
+- Breaks up monotony of long routes
+
+### Small Streets & Alleyways (8 Routes)
+1. **Park Lane** - Connects parks and natural areas
+2. **Market Street** - Links markets
+3. **Tech Road** - Tech park connection
+4. **Farm Road** - Agricultural area routes
+5. **Country Lane** - Scenic farm routes
+6. **Forest Path** - Forest connections
+7. **Valley Road** - Mountain and valley routes
+8. **Scenic Drive** - Scenic alternative routes
+
+**Benefits for Long Runs:**
+- Reduces boredom with varied environments
+- Provides alternative paths
+- Encourages exploration
+- Mix of urban, rural, and natural scenery
+- Multiple visual points of interest every short distance
 ✓ Cities provide mission destinations
 ✓ Forests offer scenic routes and NPCs
 ✓ Roads create main transportation routes

@@ -77,6 +77,10 @@ const game = {
             { x: 0, y: 1800, width: CONFIG.WORLD_WIDTH, height: 150 }
         ];
         
+        // Create mini roads within blocks
+        gameState.miniRoads = [];
+        this.generateMiniRoads();
+        
         // Create buildings
         for (let i = 0; i < 30; i++) {
             const x = Math.random() * CONFIG.WORLD_WIDTH;
@@ -87,7 +91,12 @@ const game = {
                 y >= road.y - 50 && y <= road.y + road.height + 50
             );
             
-            if (!onRoad) {
+            const onMiniRoad = gameState.miniRoads.some(road =>
+                x >= road.x - 30 && x <= road.x + road.width + 30 &&
+                y >= road.y - 30 && y <= road.y + road.height + 30
+            );
+            
+            if (!onRoad && !onMiniRoad) {
                 gameState.buildings.push({
                     x, y,
                     width: 80 + Math.random() * 60,
@@ -144,6 +153,68 @@ const game = {
         
         // Create vehicles on roads
         this.generateVehicles();
+    },
+    
+    generateMiniRoads() {
+        // Define blocks between main roads
+        const blocks = [
+            // Top-left block
+            { minX: 0, maxX: 600, minY: 0, maxY: 350 },
+            // Top-middle-left block
+            { minX: 600, maxX: 1500, minY: 0, maxY: 350 },
+            // Top-right block
+            { minX: 1500, maxX: CONFIG.WORLD_WIDTH, minY: 0, maxY: 350 },
+            // Middle-left block
+            { minX: 0, maxX: 600, minY: 350, maxY: 1000 },
+            // Middle-middle-left block
+            { minX: 600, maxX: 1500, minY: 350, maxY: 1000 },
+            // Middle-right block
+            { minX: 1500, maxX: CONFIG.WORLD_WIDTH, minY: 350, maxY: 1000 },
+            // Lower-middle-left block
+            { minX: 0, maxX: 600, minY: 1000, maxY: 1800 },
+            // Lower-middle-middle block
+            { minX: 600, maxX: 1500, minY: 1000, maxY: 1800 },
+            // Lower-middle-right block
+            { minX: 1500, maxX: CONFIG.WORLD_WIDTH, minY: 1000, maxY: 1800 },
+            // Bottom-left block
+            { minX: 0, maxX: 600, minY: 1800, maxY: CONFIG.WORLD_HEIGHT },
+            // Bottom-middle block
+            { minX: 600, maxX: 1500, minY: 1800, maxY: CONFIG.WORLD_HEIGHT },
+            // Bottom-right block
+            { minX: 1500, maxX: CONFIG.WORLD_WIDTH, minY: 1800, maxY: CONFIG.WORLD_HEIGHT }
+        ];
+        
+        // Generate mini roads within each block
+        blocks.forEach(block => {
+            const blockWidth = block.maxX - block.minX;
+            const blockHeight = block.maxY - block.minY;
+            
+            // Create 2-3 vertical mini roads per block
+            const verticalRoads = Math.floor(blockWidth / 350) + 1;
+            for (let i = 1; i < verticalRoads; i++) {
+                const x = block.minX + (i * blockWidth / verticalRoads);
+                gameState.miniRoads.push({
+                    x: x,
+                    y: block.minY,
+                    width: 70,
+                    height: blockHeight,
+                    isVertical: true
+                });
+            }
+            
+            // Create 1-2 horizontal mini roads per block
+            const horizontalRoads = Math.floor(blockHeight / 400) + 1;
+            for (let i = 1; i < horizontalRoads; i++) {
+                const y = block.minY + (i * blockHeight / horizontalRoads);
+                gameState.miniRoads.push({
+                    x: block.minX,
+                    y: y,
+                    width: blockWidth,
+                    height: 70,
+                    isVertical: false
+                });
+            }
+        });
     },
     
     generateVehicles() {
@@ -457,6 +528,25 @@ const game = {
                 }
             }
             ctx.fillStyle = '#696969';
+        });
+        
+        // Mini roads (neighborhood streets)
+        ctx.fillStyle = '#808080';
+        gameState.miniRoads.forEach(road => {
+            ctx.fillRect(road.x, road.y, road.width, road.height);
+            
+            // Add road markings
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+            if (road.isVertical) {
+                for (let i = 0; i < road.height; i += 100) {
+                    ctx.fillRect(road.x + road.width / 2 - 3, road.y + i, 6, 30);
+                }
+            } else {
+                for (let i = 0; i < road.width; i += 100) {
+                    ctx.fillRect(road.x + i, road.y + road.height / 2 - 3, 30, 6);
+                }
+            }
+            ctx.fillStyle = '#808080';
         });
         
         // Render vehicles on roads
