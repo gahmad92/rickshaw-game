@@ -88,8 +88,29 @@ const UI = {
     createControls() {
         const controls = document.createElement('div');
         controls.className = 'controls-hint';
-        controls.innerHTML = '⬆️⬇️⬅️➡️ Drive | ENTER Pick/Drop | M Mission Menu | 🔊 Sound';
+        controls.innerHTML = '⬆️⬇️⬅️➡️ Drive | ENTER Pick/Drop | M Mission Menu | 🔊 Sound | Z Fire 🔥';
         this.container.appendChild(controls);
+        
+        // Add enemy hint at bottom
+        const enemyHint = document.createElement('div');
+        enemyHint.className = 'enemy-hint';
+        enemyHint.innerHTML = '👮🤼🧔 Press Z to Fire at Enemies! 🔥';
+        enemyHint.style.cssText = `
+            position: fixed;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 100, 0, 0.9);
+            border: 2px solid #FFD700;
+            color: #FFF;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: bold;
+            z-index: 150;
+            font-family: 'Righteous', cursive;
+        `;
+        this.container.appendChild(enemyHint);
         
         // Add sound toggle button
         const soundBtn = document.createElement('button');
@@ -149,6 +170,9 @@ const UI = {
             </div>
         `;
         this.container.appendChild(dialogue);
+        
+        // Auto-close dialogue after 5 seconds
+        setTimeout(() => this.closeDialogue(), 5000);
     },
     
     closeDialogue() {

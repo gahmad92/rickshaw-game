@@ -227,14 +227,14 @@ body {
 .dialogue-box {
     position: fixed;
     bottom: 80px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 80%;
-    max-width: 900px;
+    right: 20px;
+    transform: none;
+    width: 350px;
+    max-width: 90%;
     background: rgba(0,0,0,0.95);
-    border: 5px solid #FFD700;
-    border-radius: 20px;
-    padding: 25px 35px;
+    border: 3px solid #FFD700;
+    border-radius: 12px;
+    padding: 15px 20px;
     z-index: 200;
     animation: slideUp 0.5s ease-out;
     pointer-events: all;
@@ -253,34 +253,38 @@ body {
 
 .speaker-name {
     font-family: 'Righteous', cursive;
-    font-size: 24px;
+    font-size: 14px;
     color: #FFD700;
-    margin-bottom: 10px;
+    margin-bottom: 5px;
 }
 
 .dialogue-text {
-    font-size: 20px;
-    line-height: 1.6;
+    font-size: 13px;
+    line-height: 1.4;
     color: #FFF;
-    margin-bottom: 15px;
+    margin-bottom: 10px;
 }
 
 .dialogue-options {
-    display: flex;
+    display: none;
     gap: 15px;
     margin-top: 20px;
+}
+
+.notification .dialogue-options {
+    display: flex;
 }
 
 .dialogue-btn {
     flex: 1;
     background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
     border: 3px solid #000;
-    padding: 12px 20px;
-    font-size: 16px;
+    padding: 8px 12px;
+    font-size: 12px;
     font-weight: 700;
     color: #FFF;
     cursor: pointer;
-    border-radius: 10px;
+    border-radius: 6px;
     transition: all 0.3s;
     font-family: 'Quicksand', sans-serif;
 }

@@ -43,6 +43,10 @@ const game = {
         
         gameState.isRunning = true;
         gameState.gameStartTime = Date.now();
+        
+        // Spawn enemies periodically
+        this.startEnemySpawning();
+        
         this.gameLoop();
         
         setTimeout(() => {
@@ -54,8 +58,38 @@ const game = {
     playBackgroundMusic() {
         const audio = document.getElementById('backgroundMusic');
         if (audio) {
-            audio.volume = 0.3; // Set volume to 30%
-            audio.play().catch(err => console.log('Audio autoplay blocked:', err));
+            audio.volume = 0.3;
+            audio.loop = true;
+            audio.autoplay = true;
+            
+            // Start playing
+            const playPromise = audio.play();
+            if (playPromise !== undefined) {
+                playPromise.catch(err => console.log('Audio autoplay blocked:', err));
+            }
+            
+            // Monitor audio and restart if it stops
+            const audioMonitor = setInterval(() => {
+                if (gameState.isRunning && audio.paused && !audio.ended) {
+                    audio.play().catch(err => console.log('Audio restart blocked:', err));
+                }
+                // Restart if it ended
+                if (gameState.isRunning && audio.ended) {
+                    audio.currentTime = 0;
+                    audio.play().catch(err => console.log('Audio restart blocked:', err));
+                }
+            }, 1000);
+            
+            // Store interval ID for cleanup
+            gameState.audioMonitorInterval = audioMonitor;
+            
+            // Ensure loop attribute is set
+            audio.addEventListener('ended', function() {
+                if (gameState.isRunning) {
+                    audio.currentTime = 0;
+                    audio.play().catch(err => console.log('Audio loop restart blocked:', err));
+                }
+            }, false);
         }
     },
     
@@ -64,6 +98,11 @@ const game = {
         if (audio) {
             audio.pause();
             audio.currentTime = 0;
+        }
+        
+        // Stop audio monitor
+        if (gameState.audioMonitorInterval) {
+            clearInterval(gameState.audioMonitorInterval);
         }
     },
     
@@ -153,6 +192,84 @@ const game = {
         
         // Create vehicles on roads
         this.generateVehicles();
+        
+        // Initialize enemy system
+        gameState.enemies = [];
+        gameState.projectiles = [];
+        gameState.enemySpawnInterval = null;
+        this.generateEnemies();
+    },
+    
+    startEnemySpawning() {
+        // Spawn new enemies every 8-12 seconds
+        gameState.enemySpawnInterval = setInterval(() => {
+            if (gameState.isRunning && gameState.enemies.length < 12) {
+                this.spawnNewEnemy();
+            }
+        }, 8000 + Math.random() * 4000);
+    },
+    
+    spawnNewEnemy() {
+        const road = gameState.roads[Math.floor(Math.random() * gameState.roads.length)];
+        const enemyTypes = ['police', 'sumo', 'mustache'];
+        const type = enemyTypes[Math.floor(Math.random() * enemyTypes.length)];
+        
+        let x, y;
+        if (road.width > road.height) {
+            // Horizontal road
+            x = road.x + Math.random() * road.width;
+            y = road.y + Math.random() * road.height;
+        } else {
+            // Vertical road
+            x = road.x + Math.random() * road.width;
+            y = road.y + Math.random() * road.height;
+        }
+        
+        gameState.enemies.push({
+            x: x,
+            y: y,
+            width: 40,
+            height: 40,
+            speed: 1.5 + Math.random() * 1,
+            health: 100,
+            targetX: x,
+            targetY: y,
+            type: type
+        });
+    },
+    
+    generateEnemies() {
+        // Spawn initial 3-5 enemies on various roads
+        const enemyCount = 3 + Math.floor(Math.random() * 3);
+        const enemyTypes = ['police', 'sumo', 'mustache'];
+        
+        for (let i = 0; i < enemyCount; i++) {
+            const road = gameState.roads[Math.floor(Math.random() * gameState.roads.length)];
+            const type = enemyTypes[Math.floor(Math.random() * enemyTypes.length)];
+            
+            let x, y;
+            if (road.width > road.height) {
+                // Horizontal road
+                x = road.x + Math.random() * road.width;
+                y = road.y + Math.random() * road.height;
+            } else {
+                // Vertical road
+                x = road.x + Math.random() * road.width;
+                y = road.y + Math.random() * road.height;
+            }
+            
+            gameState.enemies.push({
+                x: x,
+                y: y,
+                width: 40,
+                height: 40,
+                speed: 1.5 + Math.random() * 1,
+                health: 100,
+                targetX: x,
+                targetY: y,
+                type: type
+            });
+        }
     },
     
     generateMiniRoads() {
@@ -296,6 +413,10 @@ const game = {
             if ((e.key === 'm' || e.key === 'M') && gameState.missionComplete) {
                 this.showMissionSelect();
             }
+            
+            if ((e.key === 'z' || e.key === 'Z')) {
+                this.fireAtEnemies();
+            }
         });
         
         window.addEventListener('keyup', (e) => {
@@ -323,6 +444,38 @@ const game = {
         
         // Infinite world wrapping (no bounds)
         // Player can drive off edges and appear on the other side
+    },
+    
+    fireAtEnemies() {
+        // Find nearest enemy within range
+        let nearestEnemy = null;
+        let nearestDistance = 300;
+        
+        gameState.enemies.forEach(enemy => {
+            const distance = Math.hypot(
+                enemy.x - gameState.player.x,
+                enemy.y - gameState.player.y
+            );
+            
+            if (distance < nearestDistance) {
+                nearestDistance = distance;
+                nearestEnemy = enemy;
+            }
+        });
+        
+        if (nearestEnemy) {
+            // Create projectile towards enemy
+            const angle = Math.atan2(nearestEnemy.y - gameState.player.y, nearestEnemy.x - gameState.player.x);
+            
+            gameState.projectiles.push({
+                x: gameState.player.x,
+                y: gameState.player.y,
+                vx: Math.cos(angle) * 8,
+                vy: Math.sin(angle) * 8,
+                speed: 8,
+                damage: 25
+            });
+        }
     },
     
     updateCamera() {
@@ -445,6 +598,11 @@ const game = {
         UI.closeNotification();
         const newMission = generateRandomMission();
         gameState.missionComplete = false;
+        
+        // Clear and respawn enemies for new mission
+        gameState.enemies = [];
+        this.generateEnemies();
+        
         this.loadMission(newMission);
         
         UI.showDialogue("Mamu Butt", "Chalo, agla customer dhoondte hain! 🛺");
@@ -467,6 +625,11 @@ const game = {
         
         const selectedMission = gameState.availableMissions[index];
         gameState.missionComplete = false;
+        
+        // Clear and respawn enemies for new mission
+        gameState.enemies = [];
+        this.generateEnemies();
+        
         this.loadMission(selectedMission);
         
         UI.showDialogue("Mamu Butt", "Theek hai! Yeh ride lenge. Bismillah! 🚀");
@@ -612,6 +775,61 @@ const game = {
             }
         });
         
+        // Render enemies with different types
+        gameState.enemies.forEach(enemy => {
+            const screenX = enemy.x - gameState.camera.x;
+            const screenY = enemy.y - gameState.camera.y;
+            
+            if (screenX > -50 && screenX < window.innerWidth + 50 &&
+                screenY > -50 && screenY < window.innerHeight + 50) {
+                
+                // Draw different enemy types
+                ctx.font = 'bold 40px Arial';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                
+                if (enemy.type === 'police') {
+                    ctx.fillText('👮', screenX, screenY);
+                } else if (enemy.type === 'sumo') {
+                    ctx.fillText('🤼', screenX, screenY);
+                } else if (enemy.type === 'mustache') {
+                    ctx.fillText('🧔', screenX, screenY);
+                }
+                
+                // Health bar
+                const healthBarWidth = 40;
+                const healthPercent = enemy.health / 100;
+                ctx.fillStyle = '#00AA00';
+                ctx.fillRect(screenX - healthBarWidth / 2, screenY - 30, healthBarWidth * healthPercent, 6);
+                ctx.strokeStyle = '#000';
+                ctx.lineWidth = 1;
+                ctx.strokeRect(screenX - healthBarWidth / 2, screenY - 30, healthBarWidth, 6);
+            }
+        });
+        
+        // Render projectiles (yellow fire)
+        gameState.projectiles.forEach(proj => {
+            const screenX = proj.x - gameState.camera.x;
+            const screenY = proj.y - gameState.camera.y;
+            
+            if (screenX > -50 && screenX < window.innerWidth + 50 &&
+                screenY > -50 && screenY < window.innerHeight + 50) {
+                
+                // Yellow fire projectile
+                ctx.fillStyle = '#FFFF00';
+                ctx.beginPath();
+                ctx.arc(screenX, screenY, 8, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Fire glow
+                ctx.strokeStyle = '#FFA500';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.arc(screenX, screenY, 12, 0, Math.PI * 2);
+                ctx.stroke();
+            }
+        });
+        
         ctx.restore();
         
         // Draw navigation arrow pointing to destination
@@ -651,6 +869,8 @@ const game = {
         this.handleInput();
         this.updateCamera();
         this.updateVehicles();
+        this.updateEnemies();
+        this.updateProjectiles();
         this.wrapWorldCoordinates();
         
         gameState.timeOfDay += CONFIG.DAY_NIGHT_SPEED;
@@ -661,6 +881,51 @@ const game = {
         
         UI.updateHUD();
         UI.updateDayNightIndicator();
+    },
+    
+    updateEnemies() {
+        gameState.enemies = gameState.enemies.filter(enemy => enemy.health > 0);
+        
+        gameState.enemies.forEach(enemy => {
+            // Move towards player
+            const distX = gameState.player.x - enemy.x;
+            const distY = gameState.player.y - enemy.y;
+            const distance = Math.hypot(distX, distY);
+            
+            if (distance > 50) {
+                const angle = Math.atan2(distY, distX);
+                enemy.x += Math.cos(angle) * enemy.speed;
+                enemy.y += Math.sin(angle) * enemy.speed;
+            }
+        });
+    },
+    
+    updateProjectiles() {
+        // Move projectiles
+        gameState.projectiles.forEach(proj => {
+            proj.x += proj.vx;
+            proj.y += proj.vy;
+        });
+        
+        // Check collisions with enemies
+        gameState.projectiles = gameState.projectiles.filter(proj => {
+            let hitEnemy = false;
+            
+            gameState.enemies.forEach(enemy => {
+                const distance = Math.hypot(proj.x - enemy.x, proj.y - enemy.y);
+                if (distance < 30) {
+                    enemy.health -= proj.damage;
+                    hitEnemy = true;
+                }
+            });
+            
+            // Remove projectile if off screen or hit enemy
+            if (hitEnemy) return false;
+            if (proj.x < -100 || proj.x > CONFIG.WORLD_WIDTH + 100) return false;
+            if (proj.y < -100 || proj.y > CONFIG.WORLD_HEIGHT + 100) return false;
+            
+            return true;
+        });
     },
     
     updateVehicles() {
