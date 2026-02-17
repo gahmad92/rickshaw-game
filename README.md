@@ -1,4 +1,5 @@
 # 🛺 Mamu Butt's Rickshaw Chronicles
+https://rickshaw-mamo-butt.netlify.app/
 
 An interactive rickshaw driving game with infinite world exploration, dynamic traffic, and engaging missions.
 
@@ -39,6 +40,7 @@ An interactive rickshaw driving game with infinite world exploration, dynamic tr
    - **Arrow Keys** or **WASD** - Drive rickshaw
    - **Enter** - Pick up/Drop off passengers
    - **M** - Select mission (when available)
+   - https://rickshaw-mamo-butt.netlify.app/
 
 ### Gameplay Loop
 
